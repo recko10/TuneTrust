@@ -4,6 +4,8 @@ import os
 from bs4 import BeautifulSoup  
 import requests
 from googleapiclient.discovery import build
+import os
+from spleeter.separator import Separator
 
 ###TODO what about features? Filter them out or find a way to extract just the main artist's vocals?
 
@@ -143,4 +145,34 @@ def pull_artist(artist_name):
         else:
             print("Fail: No URL")
 
-pull_artist("Taylor Swift")
+def separate_stems(artist_name):
+    # Define the path to the directory containing the audio files
+    audio_files_directory = f'songs/{artist_name}'
+
+    # Define the output directory where the separated tracks will be saved
+    output_directory = f'songs/{artist_name}/stems'
+
+    # Ensure the output directory exists
+    os.makedirs(output_directory, exist_ok=True)
+
+    # Initialize the Separator with the desired configuration
+    separator = Separator('spleeter:2stems')  # '2stems' model separates vocals and accompaniment
+
+    # Iterate over each file in the directory
+    for filename in os.listdir(audio_files_directory):
+        if filename.endswith(".mp3") or filename.endswith(".wav"):  # Check file extension
+            file_path = os.path.join(audio_files_directory, filename)
+            try:
+                # Process the file (separate and save the vocals)
+                separator.separate_to_file(file_path, output_directory)
+                print(f"Processed {filename}")
+            except Exception as e:
+                print(f"Failed to process {filename}: {e}")
+        else:
+            print(f"Skipped {filename}")
+
+if __name__ == '__main__':
+
+#Do for all major artists 
+    # pull_artist("Taylor Swift")
+    # separate_stems("Taylor Swift")
