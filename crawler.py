@@ -172,7 +172,6 @@ def separate_stems(artist_name):
             print(f"Skipped {filename}")
 
 if __name__ == '__main__':
-
 #Do for all major artists 
     # pull_artist("Taylor Swift")
     # separate_stems("Taylor Swift")
