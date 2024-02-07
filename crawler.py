@@ -21,8 +21,12 @@ def download_song(link, artistName):
     yt = YouTube( 
         str(link))
     
-    # extract only audio 
-    video = yt.streams.filter(only_audio=True).first() 
+    try:
+        # extract only audio 
+        video = yt.streams.filter(only_audio=True).first()
+    except KeyError:
+        print("Something went wrong! Skipping song")
+        return None
     
     # check for destination to save file 
     print("Enter the destination (leave blank for current directory)") 
@@ -38,6 +42,7 @@ def download_song(link, artistName):
     
     # result of success 
     print(yt.title + " has been successfully downloaded.")
+    return True
 
 # Get an access token
 def get_access_token(client_id, client_secret):
@@ -131,8 +136,11 @@ def pull_artist(artist_name):
         if video_url:
             print(f"Video title: {video_title}")
             print(f"Video URL: {video_url}")
-            download_song(video_url, artist_name)
+            if download_song(video_url, artist_name):
+                print("Download success")
+            else:
+                print("Download fail")
         else:
             print("Fail: No URL")
 
-# pull_artist("Drake")
+pull_artist("Taylor Swift")
