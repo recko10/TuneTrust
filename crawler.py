@@ -202,8 +202,6 @@ def upload_folder_to_gcs(bucket_name, source_folder, destination_prefix=""):
             blob.upload_from_filename(local_path)
             print(f"Uploaded {local_path} to gs://{bucket_name}/{blob_name}")
 
-
-
 if __name__ == '__main__':
     for artist in fetch_top_100():
         pull_artist(artist)
