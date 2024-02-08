@@ -6,6 +6,7 @@ import requests
 from googleapiclient.discovery import build
 import os
 from spleeter.separator import Separator
+import billboard
 
 ###TODO what about features? Filter them out or find a way to extract just the main artist's vocals?
 
@@ -171,7 +172,21 @@ def separate_stems(artist_name):
         else:
             print(f"Skipped {filename}")
 
+def fetch_top_100():
+    # Fetch the Hot 100 chart
+    chart = billboard.ChartData('artist-100')
+
+    # Initialize a dictionary to count appearances
+    artists = []
+
+    # Iterate through the chart entries
+    for song in chart:
+        artist_name = song.artist
+        artists.append(artist_name)
+
+    return artists 
+
 if __name__ == '__main__':
-#Do for all major artists 
-    # pull_artist("Taylor Swift")
-    # separate_stems("Taylor Swift")
+    for artist in fetch_top_100():
+        pull_artist(artist)
+        separate_stems(artist)
