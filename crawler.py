@@ -7,8 +7,9 @@ from googleapiclient.discovery import build
 import os
 from spleeter.separator import Separator
 import billboard
+from google.cloud import storage
 
-###TODO what about features? Filter them out or find a way to extract just the main artist's vocals?
+###TODO what about features? Filter them out or find a way to extract just the main artist's vocals? Speech diarization to seprate
 
 # Spotify API credentials
 client_id = '3b64e6bb35194f178259cd780c36b780'
@@ -186,7 +187,28 @@ def fetch_top_100():
 
     return artists 
 
+def upload_folder_to_gcs(bucket_name, source_folder, destination_prefix=""):
+    """Uploads the contents of a local folder to a GCS bucket, preserving the folder structure."""
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    
+    for root, _, files in os.walk(source_folder):
+        for filename in files:
+            local_path = os.path.join(root, filename)
+            relative_path = os.path.relpath(local_path, start=source_folder)
+            blob_name = os.path.join(destination_prefix, relative_path)
+            blob = bucket.blob(blob_name.replace("\\", "/"))  # Ensure proper path separator for GCS
+            
+            blob.upload_from_filename(local_path)
+            print(f"Uploaded {local_path} to gs://{bucket_name}/{blob_name}")
+
+
+
 if __name__ == '__main__':
     for artist in fetch_top_100():
         pull_artist(artist)
         separate_stems(artist)
+        upload_folder_to_gcs("tunetrust-training-data", f"songs/{artist}/stems", f"{artist}")
+
+
+# gcloud compute scp --recurse ./ tunetrust-compute:./    to copy over this whole folder to the instance
