@@ -1,5 +1,6 @@
 # importing packages 
-from pytube import YouTube 
+from pytube import YouTube
+from pytube import Playlist
 import os
 from bs4 import BeautifulSoup  
 import requests
@@ -8,6 +9,9 @@ import os
 from spleeter.separator import Separator
 import billboard
 from google.cloud import storage
+from googleapiclient.errors import HttpError
+from moviepy.editor import AudioFileClip
+
 
 ###TODO what about features? Filter them out or find a way to extract just the main artist's vocals? Speech diarization to seprate
 
@@ -114,6 +118,7 @@ def get_all_tracks(artist_name):
     tracks = get_all_tracks_from_albums(albums, access_token)
     return tracks
 
+#TODO optimize this query—can we remove the "video_title" variable?
 def search_youtube(query):
     # Search request
     search_response = youtube.search().list(
@@ -147,13 +152,42 @@ def pull_artist(artist_name):
         else:
             print("Fail: No URL")
 
+def convert_mp4_to_mp3(path):
+    # Check if the path exists and is a directory
+    if not os.path.isdir(path):
+        print("The provided path is not a directory or does not exist.")
+        return
+
+    # Iterate over all files in the directory
+    for filename in os.listdir(path):
+        # Check if the file is an MP4 file
+        if filename.endswith(".mp4"):
+            # Construct full file path for the MP4
+            full_path_mp4 = os.path.join(path, filename)
+            # Construct MP3 filename
+            mp3_filename = os.path.splitext(filename)[0] + ".mp3"
+            # Construct full file path for the MP3
+            full_path_mp3 = os.path.join(path, mp3_filename)
+            # Extract and save the audio
+            audio_clip = AudioFileClip(full_path_mp4)
+            audio_clip.write_audiofile(full_path_mp3)
+            # Close the clip to free resources
+            audio_clip.close()
+            print(f"Converted {filename} to {mp3_filename}")
+            # Delete the original MP4 file
+            os.remove(full_path_mp4)
+            print(f"Deleted original file: {filename}")
+
 def separate_stems(artist_name):
     # Define the path to the directory containing the audio files
     audio_files_directory = f'songs/{artist_name}'
 
+    #Make sure we are only dealing with mp3 files
+    convert_mp4_to_mp3(audio_files_directory)
+
     # Define the output directory where the separated tracks will be saved
     output_directory = f'songs/{artist_name}/stems'
-
+    
     # Ensure the output directory exists
     os.makedirs(output_directory, exist_ok=True)
 
@@ -202,11 +236,33 @@ def upload_folder_to_gcs(bucket_name, source_folder, destination_prefix=""):
             blob.upload_from_filename(local_path)
             print(f"Uploaded {local_path} to gs://{bucket_name}/{blob_name}")
 
+# If YT API expires use this to brute force download off playlists
+def download_playlist(playlist_url, artist_name):
+    playlist = Playlist(playlist_url)
+    for video in playlist.videos:
+        try:
+            audio_stream = video.streams.get_audio_only()
+            audio_stream.download(output_path=f'songs/{artist_name}')  # Specify your output directory
+        except Exception:
+            print("Exception thrown skip this track")
+
+
 if __name__ == '__main__':
-    for artist in fetch_top_100():
-        pull_artist(artist)
-        separate_stems(artist)
-        upload_folder_to_gcs("tunetrust-training-data", f"songs/{artist}/stems", f"{artist}")
+    # download_playlist("https://www.youtube.com/watch?v=4ZAh5cNoz_E&list=PLObtfyqnio7zB6aGAkKaxPxznvGuLednn", "Kanye West")
+    # for artist in fetch_top_100():
+    #     pull_artist(artist)
+    #     separate_stems(artist)
+    #     upload_folder_to_gcs("tunetrust-training-data", f"songs/{artist}/stems", f"{artist}")
+
+    separate_stems("Taylor Swift")
+    #TODO select the model of choice
+    #TODO figure out what format to use when passing the data to the model
+    #TODO speaker diarization on all to extract the target artist's vocals and get into aforementioned format
+    #TODO (for later step) upload data into GCS and summon audio inidividually using GCS API—this way I won't kill my local storage
+    #TODO train model and get some benchmarks
+    #TODO 1 model idea: assuming k drake audio acapellas in the training set, run NVDIA embedding model using each one against the song in question and take the majority (80% >) decision as to whether the vocal is a drake vocal
 
 
 # gcloud compute scp --recurse ./ tunetrust-compute:./    to copy over this whole folder to the instance
+    
+# Solve for only 3 artists: Drake, Taylor Swift, Kanye
