@@ -2,12 +2,18 @@ import nemo.collections.asr as nemo_asr
 import pandas as pd
 import os
 import torch.nn as nn
+import torch
 
+
+'''
+-TODO featured artists? comparing stems to songs instead of other stems? averaging embeddings? Add reference artist to compareAll function outut
+-front end stores one representative drake embedding
+-compare acapella to acapella
+'''
 speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
 
 # Compares one song to the reference (output new row in df)
 def compareOne(reference_artist, reference_song, curr_artist, curr_song):
-    verify = speaker_model.verify_speakers(f"songs/{reference_artist}/stems/{reference_song}/vocals.wav",f"songs/{curr_artist}/{curr_song}.mp3")
     verify = speaker_model.verify_speakers(f"songs/{reference_artist}/stems/{reference_song}/vocals.wav",f"songs/{curr_artist}/{curr_song}.mp3")
     new_row = {f'Reference Artist': f'{reference_artist}', 'Reference Song Name': f'{reference_song}', 'Compared Artist': f'{curr_artist}', 'Compared Song Name': f'{curr_song}', 'Result': verify}
 
@@ -40,19 +46,16 @@ def compareAll(reference_artist, reference_song):
                 print(df)
     df.to_excel("output.xlsx")
 
-                
-    
-drake_emb = speaker_model.get_embedding("/Users/adithreddi/Desktop/TuneTrust/songs/Drake/stems/6 God/vocals.wav")
-taylor_emb = speaker_model.get_embedding("/Users/adithreddi/Desktop/TuneTrust/songs/Taylor Swift/stems/22/vocals.wav")
-# taylor_emb = speaker_model.get_embedding("/Users/adithreddi/Desktop/TuneTrust/songs/Drake/stems/6 Man/vocals.wav")
+#Check if two speakers are the same by getting their respective embeddings and running cosine similarity
+def sameSpeaker(reference_artist, path_to_upload):
+    print("REF: " + reference_artist)
+    print("NEW: " + path_to_upload)
 
-print(drake_emb)
-print(taylor_emb)
-cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-print(cos(drake_emb, taylor_emb))
+    # ref_emb = speaker_model.get_embedding(f"songs/{reference_artist}/stems/{reference_song}/vocals.wav")
+    ref_emb = torch.load('embeddings.pt')[reference_artist]
+    new_emb = speaker_model.get_embedding(path_to_upload)
+    # torch.save({'Drake': ref_emb, 'Taylor Swift': new_emb}, 'embeddings.pt')
 
+    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+    return (cos(ref_emb, new_emb) > 0.5).item()
 
-#TODO featured artists? comparing stems to songs instead of other stems? averaging embeddings? Add reference artist to compareAll function outut
-
-#front end stores one representative drake embedding
-#compare acapella to acapella
