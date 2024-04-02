@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from classifier import sameSpeaker
+from classifier import topProbSpeakers
 from django.http import JsonResponse
 
 from rest_framework import status
@@ -17,23 +18,19 @@ from rest_framework.decorators import api_view
 # Create your views here.
 @api_view(['GET'])
 def demo(request):
-
-    #In the future, update this so that we store all the embeddings for the artists. Then, when set the reference artist we just directly refer to their embedding in the database.
-    #This will remove the need for these silly if statements
-    reference_artist = request.query_params.get('artist', None)
-
     directory_path = 'media/audio_files'
     files = os.listdir(directory_path)
     first_file = files[0] if files else None
     print("First file:", first_file)
 
-    response = JsonResponse({"result" : sameSpeaker(reference_artist, os.path.join(directory_path, first_file) )})
+    response = JsonResponse({"result" : topProbSpeakers(os.path.join(directory_path, first_file))})
 
     os.remove(os.path.join(directory_path, first_file))
-    print("File deleted:", first_file)
+    print("File deleted:", first_file)  
 
     return response
-    # return render(request, 'hello.html', {'name': 'Adith'})
+
+
 
 class AudioFileUpload(APIView):
     @method_decorator(csrf_exempt)

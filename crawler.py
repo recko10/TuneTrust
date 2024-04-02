@@ -248,21 +248,16 @@ def download_playlist(playlist_url, artist_name):
 
 
 if __name__ == '__main__':
-    # download_playlist("https://www.youtube.com/watch?v=4ZAh5cNoz_E&list=PLObtfyqnio7zB6aGAkKaxPxznvGuLednn", "Kanye West")
-    # for artist in fetch_top_100():
-    #     pull_artist(artist)
-    #     separate_stems(artist)
-    #     upload_folder_to_gcs("tunetrust-training-data", f"songs/{artist}/stems", f"{artist}")
+    print("Start")
+    #Find representative songs from artists
+    #Separate stems for each of the artists using separate_stems
+    #Convert kanye files to mp3 before getting stems
 
-    separate_stems("Taylor Swift")
-    #TODO select the model of choice
-    #TODO figure out what format to use when passing the data to the model
-    #TODO speaker diarization on all to extract the target artist's vocals and get into aforementioned format
-    #TODO (for later step) upload data into GCS and summon audio inidividually using GCS API—this way I won't kill my local storage
-    #TODO train model and get some benchmarks
-    #TODO 1 model idea: assuming k drake audio acapellas in the training set, run NVDIA embedding model using each one against the song in question and take the majority (80% >) decision as to whether the vocal is a drake vocal
-
+    artists = ["Kanye West", "Playboi Carti", "Rihanna", "Future", "Young Thug", "Travis Scott", "Lil Baby", 
+               "Lil Uzi Vert", "Lil Wayne", "Tyler, the Creator", "Jay-Z", "Kid Cudi", "Snoop Dogg", "Eminem",
+               "Westside Gunn", "Conway the Machine", "Danny Brown", "Freddie Gibbs", "Lauryn Hill", "Hayley Williams"]
+    for x in artists:
+        separate_stems(x) 
 
 # gcloud compute scp --recurse ./ tunetrust-compute:./    to copy over this whole folder to the instance
     
-# Solve for only 3 artists: Drake, Taylor Swift, Kanye

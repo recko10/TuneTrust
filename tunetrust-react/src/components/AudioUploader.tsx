@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import ArtistProbabilitiesTable from './ArtistProbabilitiesTable.tsx';
 
 const AudioUploader = () => {
     const [audioFile, setAudioFile] = useState<File | null>(null);
-    const [selectedArtist, setSelectedArtist] = useState<string>('');
-    const [submissionResult, setSubmissionResult] = useState('');
+    const [selectedArtist, _setSelectedArtist] = useState<string>('');
+    const [submissionResult, _setSubmissionResult] = useState('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [artistProbs, setArtistProbs] = useState(null);
 
     const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
@@ -16,11 +18,6 @@ const AudioUploader = () => {
             }
         }
     };
-
-    const handleArtistChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedArtist(event.target.value);
-    };
-
 
     async function callApiDemo(selectedArtist: string) {
         setIsLoading(true);
@@ -46,12 +43,9 @@ const AudioUploader = () => {
             // Parse the JSON response
             const data = await response.json();
             
-            // Use the data from the response
-            if (data["result"]) {
-                setSubmissionResult("Same artist!"); //Update the state
-            } else {
-                setSubmissionResult("Different artist!"); //Update the state
-            }
+            const resultObject = data["result"]; // Assuming this is your object
+            setArtistProbs(resultObject)
+            
             return data["result"];
         } catch (error) {
             console.error('Error calling the API:', error);
@@ -100,11 +94,15 @@ const AudioUploader = () => {
             }
         }
     };
+
     return (
-        <div className="container mt-5">
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label htmlFor="audioFile" className="form-label">Upload Audio File</label>
+        <div className="fixed-top">
+        <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+            <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '500px' }}>
+                <div className="mb-3 text-center">
+                    <label htmlFor="audioFile" className="form-label">
+                    Upload a Song to Inspect
+                    </label>
                     <input
                         type="file"
                         className="form-control"
@@ -112,21 +110,11 @@ const AudioUploader = () => {
                         onChange={handleAudioUpload}
                         accept="audio/*"
                     />
+                    
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="artistSelect" className="form-label">Select Artist</label>
-                    <select
-                        id="artistSelect"
-                        className="form-select"
-                        value={selectedArtist}
-                        onChange={handleArtistChange}
-                    >
-                        <option value="">Select an artist</option>
-                        <option value="Taylor Swift">Taylor Swift</option>
-                        <option value="Drake">Drake</option>
-                    </select>
+                <div className="d-grid gap-2">
+                    <button type="submit" className="btn btn-primary">Submit</button>
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
                 {isLoading && (
                     <div className="mt-3 d-flex justify-content-center">
                         <div className="spinner-border" role="status">
@@ -134,10 +122,17 @@ const AudioUploader = () => {
                         </div>
                     </div>
                 )}
-                {!isLoading && submissionResult && <div className="mt-3">{submissionResult}</div>}
+                {!isLoading && submissionResult && (
+                    <div className="alert alert-success mt-3 text-center">{submissionResult}</div>
+                )}
+                <div className="mt-3">
+                {artistProbs && <ArtistProbabilitiesTable data={artistProbs} />}
+                </div>
             </form>
         </div>
+        </div>
     );
+    
 };
 
 export default AudioUploader;
