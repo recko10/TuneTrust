@@ -3,16 +3,18 @@ import pandas as pd
 import os
 import torch.nn as nn
 import torch
-import math
 from pydub import AudioSegment
 import glob
-
-# instantiate the pipeline
 from pyannote.audio import Pipeline
 from pyannote.audio.pipelines.utils.hook import ProgressHook
+
 pipeline = Pipeline.from_pretrained(
   "pyannote/speaker-diarization-3.1",
   use_auth_token="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")
+
+if (torch.cuda.is_available()):
+    print("Cuda available...using GPU ")
+    pipeline.to(torch.device("cuda"))
 
 speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
 
@@ -41,7 +43,7 @@ def topProbSpeakers(path_to_upload):
     speakerDR(path_to_upload)
 
     cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-    threshold = 0.5
+    threshold = 0.5 #0.5 originally
     ref_embs = torch.load('embeddings.pt')
 
     artist_to_probs = {}

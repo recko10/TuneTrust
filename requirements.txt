@@ -1,9 +1,0 @@
-pytube==15.0.0  # Specify the version you prefer
-beautifulsoup4==4.12.2  # Use bs4 for web scraping
-requests==2.31.0  # For making HTTP requests
-google-api-python-client==2.116.0  # For YouTube API interactions
-google-auth==2.22.0   # Might be needed for Google API authentication
-google-auth-oauthlib==0.5.2  # For OAuth flow with Google APIs
-google-auth-httplib2==0.2.0  # Additional Google auth dependencies
-spleeter==2.3.2
-billboard-py==7.0.0
