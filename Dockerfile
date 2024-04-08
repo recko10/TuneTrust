@@ -20,7 +20,6 @@ EXPOSE 8000
 # Define environment variable
 ENV NAME World
 # Run the application.
-#CMD gunicorn 'tunetrust.wsgi' --bind=0.0.0.0:8000
 CMD gunicorn --config gunicorn.conf.py tunetrust.wsgi:application 
 
 
