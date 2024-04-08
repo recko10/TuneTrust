@@ -25,7 +25,7 @@ const AudioUploader = () => {
         const queryString = new URLSearchParams({ artist: selectedArtist }).toString();
     
         // Append the query string to the API endpoint URL
-        const url = `http://127.0.0.1:8000/playground/demo/?${queryString}`; //TODO change from localhost
+        const url = `http://184.23.21.112:8000/playground/demo/?${queryString}`; //TODO change from localhost
         
         try {
             // Make a GET request to the API with the selected artist as a parameter
@@ -69,7 +69,7 @@ const AudioUploader = () => {
             formData.append('artist', selectedArtist); // Include the selected artist in the form data
 
             try {
-                const response = await fetch('http://localhost:8000/playground/upload/', { //TODO change from localhost
+                const response = await fetch('http://184.23.21.112:8000/playground/upload/', { //TODO change from localhost
                     method: 'POST',
                     body: formData,
                 });
