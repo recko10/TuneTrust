@@ -12,29 +12,13 @@ pipeline = Pipeline.from_pretrained(
   "pyannote/speaker-diarization-3.1",
   use_auth_token="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")
 
+speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
+
 if (torch.cuda.is_available()):
     print("Cuda available...using GPU ")
     pipeline.to(torch.device("cuda"))
+    speaker_model.to(torch.device("cuda"))
 
-speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
-
-#Check if two speakers are
-#  the same by getting their respective embeddings and running cosine similarity
-def sameSpeaker(reference_artist, path_to_upload):
-
-    print("REF: " + reference_artist)
-    print("NEW: " + path_to_upload)
-
-    ref_emb = torch.load('embeddings.pt')[reference_artist]
-    new_emb = speaker_model.get_embedding(path_to_upload)
-
-    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-    return (cos(ref_emb, new_emb) > 0.5).item()
-
-#Return a dict of artist names mapped to their probabilities
-#TODO update to call the speaker diarization function, run this function on each vocal resulting from that, return the max probability values for each
-#TODO don't forget to clean up the diarization_temp directory after using it
-#TODO in the long term, you can move the diarization temp directory to thge django backend for consistency and deployability
 #TODO write function to remove all spaces from song file names when they are uploaded (replace with underscore)
 
 def topProbSpeakers(path_to_upload):
