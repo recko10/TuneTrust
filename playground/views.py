@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from classifier import sameSpeaker
 from classifier import topProbSpeakers
 from django.http import JsonResponse
 
