@@ -1,5 +1,4 @@
 import nemo.collections.asr as nemo_asr
-import pandas as pd
 import os
 import torch.nn as nn
 import torch
@@ -7,17 +6,16 @@ from pydub import AudioSegment
 import glob
 from pyannote.audio import Pipeline
 from pyannote.audio.pipelines.utils.hook import ProgressHook
+import replicate
+from cog import Path
 
-pipeline = Pipeline.from_pretrained(
-  "pyannote/speaker-diarization-3.1",
-  use_auth_token="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")
+replicate.api_token = os.getenv("REPLICATE_API_TOKEN")
+
+# pipeline = Pipeline.from_pretrained(
+#   "pyannote/speaker-diarization-3.1",
+#   use_auth_token="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")
 
 speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
-
-if (torch.cuda.is_available()):
-    print("Cuda available...using GPU ")
-    pipeline.to(torch.device("cuda"))
-    speaker_model.to(torch.device("cuda"))
 
 #TODO write function to remove all spaces from song file names when they are uploaded (replace with underscore)
 
@@ -96,13 +94,33 @@ def saveAllSpeakers():
     
 #Take an audio file as input and diarize it (ensure that no paths have spaces in them)
 def speakerDR(path_to_upload):
-    # run the pipeline on an audio file
-    with ProgressHook() as hook:
-        diarization = pipeline(path_to_upload, min_speakers=1, max_speakers=3, hook=hook)
+    # # run the pipeline on an audio file
+    # with ProgressHook() as hook:
+    #     diarization = pipeline(path_to_upload, min_speakers=1, max_speakers=3, hook=hook)
 
-    # dump the diarization output to disk using RTTM format
-    with open("audio.rttm", "w") as rttm:
-        diarization.write_rttm(rttm)
+    # # dump the diarization output to disk using RTTM format
+    # with open("audio.rttm", "w") as rttm:
+    #     diarization.write_rttm(rttm)
+    
+    #--------------------------------
+    
+    # prediction = replicate.run(
+    # "recko10/tunetrust-gpu:d990d646",
+    # input={
+    #     "path_to_upload": Path(path_to_upload)
+    # }
+    # )
+
+    # # Wait for the prediction to complete
+    # prediction = replicate.predictions.get(prediction["id"])
+    # while prediction["status"] not in ["succeeded", "failed"]:
+    #     prediction = replicate.predictions.get(prediction["id"])
+
+    # # Check if the prediction succeeded and print the output
+    # if prediction["status"] == "succeeded":
+    #     print("Prediction output:", prediction["output"])
+    # else:
+    #     print("Prediction failed:", prediction["error"])
 
     segments = parse_rttm("audio.rttm")
     extract_segments(path_to_upload, segments)
