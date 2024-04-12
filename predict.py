@@ -1,9 +1,9 @@
 # Prediction interface for Cog ⚙️
 # https://cog.run/python
 
-from cog import BasePredictor, Input, Path, File, BaseModel
-import nemo.collections.asr as nemo_asr
-import torch.nn as nn
+from cog import BasePredictor, Input, Path
+# import nemo.collections.asr as nemo_asr
+# import torch.nn as nn
 from pyannote.audio import Pipeline
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 
