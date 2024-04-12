@@ -6,14 +6,10 @@ from pydub import AudioSegment
 import glob
 from pyannote.audio import Pipeline
 from pyannote.audio.pipelines.utils.hook import ProgressHook
-import replicate
-from cog import Path
 
-replicate.api_token = os.getenv("REPLICATE_API_TOKEN")
-
-# pipeline = Pipeline.from_pretrained(
-#   "pyannote/speaker-diarization-3.1",
-#   use_auth_token="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")
+pipeline = Pipeline.from_pretrained(
+  "pyannote/speaker-diarization-3.1",
+  use_auth_token="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")
 
 speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
 
@@ -94,33 +90,16 @@ def saveAllSpeakers():
     
 #Take an audio file as input and diarize it (ensure that no paths have spaces in them)
 def speakerDR(path_to_upload):
-    # # run the pipeline on an audio file
-    # with ProgressHook() as hook:
-    #     diarization = pipeline(path_to_upload, min_speakers=1, max_speakers=3, hook=hook)
 
-    # # dump the diarization output to disk using RTTM format
-    # with open("audio.rttm", "w") as rttm:
-    #     diarization.write_rttm(rttm)
-    
-    #--------------------------------
-    
-    # prediction = replicate.run(
-    # "recko10/tunetrust-gpu:d990d646",
-    # input={
-    #     "path_to_upload": Path(path_to_upload)
-    # }
-    # )
+    # TODO replace below with predict.py https call
+    # run the pipeline on an audio file
+    with ProgressHook() as hook:
+        diarization = pipeline(path_to_upload, min_speakers=1, max_speakers=3, hook=hook)
 
-    # # Wait for the prediction to complete
-    # prediction = replicate.predictions.get(prediction["id"])
-    # while prediction["status"] not in ["succeeded", "failed"]:
-    #     prediction = replicate.predictions.get(prediction["id"])
-
-    # # Check if the prediction succeeded and print the output
-    # if prediction["status"] == "succeeded":
-    #     print("Prediction output:", prediction["output"])
-    # else:
-    #     print("Prediction failed:", prediction["error"])
+    # dump the diarization output to disk using RTTM format
+    with open("audio.rttm", "w") as rttm:
+        diarization.write_rttm(rttm)
+    #-----------------------------
 
     segments = parse_rttm("audio.rttm")
     extract_segments(path_to_upload, segments)
