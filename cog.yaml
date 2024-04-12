@@ -1,13 +1,8 @@
 # Configuration for Cog ⚙️
 # Reference: https://cog.run/yaml
 build:
-  # set to true if your model requires a GPU
   gpu: true 
-  # cuda: "12.1" #REVERT: add this back in
-  # cuda: "11.8.0"
-  # a list of ubuntu apt packages to install
 
-  #TODO: ISSUE IS WITH CUDA VERSION? 
 
   system_packages:
     - "libgl1-mesa-glx"
