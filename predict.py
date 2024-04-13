@@ -2,6 +2,7 @@
 # https://cog.run/python
 
 from cog import BasePredictor, Input, Path
+import torch
 # import nemo.collections.asr as nemo_asr
 # import torch.nn as nn
 from pyannote.audio import Pipeline
@@ -13,8 +14,14 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 class Predictor(BasePredictor):
     def setup(self) -> None:
-        """Load the model into memory to make running multiple predictions efficient"""
-        # self.model = torch.load("./weights.pth")
+        #activate CUDA
+        if torch.cuda.is_available():
+            torch.set_default_tensor_type(torch.cuda.FloatTensor)
+            print("Using CUDA:", torch.cuda.get_device_name(0))
+        else:
+            print("CUDA is not available. Using CPU instead.")
+
+        #load pipeline
         self.pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token="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")
         
     def predict(

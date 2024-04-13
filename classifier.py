@@ -4,12 +4,10 @@ import torch.nn as nn
 import torch
 from pydub import AudioSegment
 import glob
-from pyannote.audio import Pipeline
-from pyannote.audio.pipelines.utils.hook import ProgressHook
+from google.cloud import storage
+import requests
+import base64
 
-pipeline = Pipeline.from_pretrained(
-  "pyannote/speaker-diarization-3.1",
-  use_auth_token="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")
 
 speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/speakerverification_en_titanet_large")
 
@@ -91,15 +89,37 @@ def saveAllSpeakers():
 #Take an audio file as input and diarize it (ensure that no paths have spaces in them)
 def speakerDR(path_to_upload):
 
-    # TODO replace below with predict.py https call
-    # run the pipeline on an audio file
-    with ProgressHook() as hook:
-        diarization = pipeline(path_to_upload, min_speakers=1, max_speakers=3, hook=hook)
+    songName = os.path.basename(path_to_upload)
+    print("SONG NAME: " + songName)
 
-    # dump the diarization output to disk using RTTM format
-    with open("audio.rttm", "w") as rttm:
-        diarization.write_rttm(rttm)
-    #-----------------------------
+    # Define the URL and the headers
+    url = 'http://129.146.68.17:5001/predictions'
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+
+    # Define the payload data
+    data = {
+        "input": {
+            "path_to_upload": f"https://storage.googleapis.com/bucket-quickstart_tunetrust/{songName}"
+        }
+    }
+
+    # Send the POST request
+    response = requests.post(url, json=data, headers=headers)
+
+    # Your base64 URL
+    data_url = requests.json()['output']
+
+    # Strip the prefix to get only the base64 part
+    _, base64_data = data_url.split(',', 1)
+
+    # Decode the base64 data to get the original content
+    decoded_data = base64.b64decode(base64_data).decode('utf-8')
+
+    # Save the decoded data to a file
+    with open('audio.rttm', 'w') as file:
+        file.write(decoded_data)
+    print("File downloaded and saved successfully.")
+
 
     segments = parse_rttm("audio.rttm")
     extract_segments(path_to_upload, segments)
@@ -171,4 +191,52 @@ def cleanup_full_files(directory="diarization_temp"):
         os.remove(file_path)
         print(f"Deleted {file_path}")
 
-# speakerDR("songs/Drake/Uptown_Drake_ft_Lil_Wayne_&_Bun_B.mp3")
+def upload_blob(bucket_name, source_file_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    # The ID of your GCS bucket
+    # The path to your file to upload
+    # The ID to give your file in GCS
+
+    # Initializes a client
+    storage_client = storage.Client()
+
+    # The name of the bucket
+    bucket = storage_client.bucket(bucket_name)
+
+    # Creates a new blob and uploads the file's content.
+    blob = bucket.blob(destination_blob_name)
+
+    blob.upload_from_filename(source_file_name)
+
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
+
+from google.cloud import storage
+
+def delete_blob(bucket_name, blob_name):
+    """Deletes a blob from the bucket."""
+    # The ID of your GCS bucket
+    # The ID of the GCS object to delete
+
+    # Initialize a client
+    storage_client = storage.Client()
+
+    # Get the bucket
+    bucket = storage_client.bucket(bucket_name)
+
+    # Get the blob
+    blob = bucket.blob(blob_name)
+
+    # Delete the blob
+    blob.delete()
+
+    print(f"Blob {blob_name} deleted.")
+
+def safe_delete_blob(bucket_name, blob_name):
+    try:
+        delete_blob(bucket_name, blob_name)
+    except storage.exceptions.NotFound:
+        print(f"The blob {blob_name} does not exist.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
