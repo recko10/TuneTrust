@@ -13,5 +13,7 @@ __pycache__
 .pytest_cache
 .ruff_cache
 
+tunetrust-b19e33e4ecec.json
+
 # Exclude Python virtual environment
 /venv
