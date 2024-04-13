@@ -107,7 +107,7 @@ def speakerDR(path_to_upload):
     response = requests.post(url, json=data, headers=headers)
 
     # Your base64 URL
-    data_url = requests.json()['output']
+    data_url = response.json()['output']
 
     # Strip the prefix to get only the base64 part
     _, base64_data = data_url.split(',', 1)

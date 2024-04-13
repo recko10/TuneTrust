@@ -14,16 +14,17 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 class Predictor(BasePredictor):
     def setup(self) -> None:
+        #load pipeline
+        self.pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token="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")
+
         #activate CUDA
         if torch.cuda.is_available():
             torch.set_default_tensor_type(torch.cuda.FloatTensor)
+            self.pipeline.to(torch.device("cuda"))
             print("Using CUDA:", torch.cuda.get_device_name(0))
         else:
             print("CUDA is not available. Using CPU instead.")
 
-        #load pipeline
-        self.pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token="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")
-        
     def predict(
         self,
         path_to_upload: Path = Input(
