@@ -1,31 +1,31 @@
 #!/bin/bash
 
 # Install Conda packages
-# conda install -y bzip2=1.0.8 -c conda-forge
-# conda install -y ca-certificates=2024.2.2 -c conda-forge
-# conda install -y freetype=2.10.4 -c conda-forge
-# conda install -y gettext=0.21.1 -c conda-forge
-# conda install -y gmp=6.2.1 -c conda-forge
-# conda install -y gnutls=3.6.15 -c conda-forge
-# conda install -y lame=3.100 -c conda-forge
-# conda install -y libflac=1.3.4 -c conda-forge
-# conda install -y libiconv=1.17 -c conda-forge
-# conda install -y libidn2=2.3.7 -c conda-forge
-# conda install -y libogg=1.3.4 -c conda-forge
-# conda install -y libopus=1.3.1 -c conda-forge
-# conda install -y libpng=1.6.39 -c conda-forge
-# conda install -y libsndfile=1.0.31 -c conda-forge
-# conda install -y libtasn1=4.19.0 -c conda-forge
-# conda install -y libunistring=0.9.10 -c conda-forge
-# conda install -y libvorbis=1.3.7 -c conda-forge
-# conda install -y libvpx=1.10.0 -c conda-forge
-# conda install -y ncurses=6.4 -c conda-forge
-# conda install -y nettle=3.7.3 -c conda-forge
-# conda install -y openssl=3.2.1 -c conda-forge
-# conda install -y sqlite=3.41.2 -c conda-forge
-# conda install -y x264=1!152.20180806 -c conda-forge
-# conda install -y xz=5.4.5 -c conda-forge
-# conda install -y zlib=1.2.13 -c conda-forge
+conda install -y bzip2=1.0.8 -c conda-forge
+conda install -y ca-certificates=2024.2.2 -c conda-forge
+conda install -y freetype=2.10.4 -c conda-forge
+conda install -y gettext=0.21.1 -c conda-forge
+conda install -y gmp=6.2.1 -c conda-forge
+conda install -y gnutls=3.6.15 -c conda-forge
+conda install -y lame=3.100 -c conda-forge
+conda install -y libflac=1.3.4 -c conda-forge
+conda install -y libiconv=1.17 -c conda-forge
+conda install -y libidn2=2.3.7 -c conda-forge
+conda install -y libogg=1.3.4 -c conda-forge
+conda install -y libopus=1.3.1 -c conda-forge
+conda install -y libpng=1.6.39 -c conda-forge
+conda install -y libsndfile=1.0.31 -c conda-forge
+conda install -y libtasn1=4.19.0 -c conda-forge
+conda install -y libunistring=0.9.10 -c conda-forge
+conda install -y libvorbis=1.3.7 -c conda-forge
+conda install -y libvpx=1.10.0 -c conda-forge
+conda install -y ncurses=6.4 -c conda-forge
+conda install -y nettle=3.7.3 -c conda-forge
+conda install -y openssl=3.2.1 -c conda-forge
+conda install -y sqlite=3.41.2 -c conda-forge
+conda install -y x264=1!152.20180806 -c conda-forge
+conda install -y xz=5.4.5 -c conda-forge
+conda install -y zlib=1.2.13 -c conda-forge
 
 # Install pip packages
 pip install Django==4.2.10
