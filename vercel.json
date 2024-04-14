@@ -3,7 +3,10 @@
     "builds": [{
       "src": "manage.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "50mb" }
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python-3.9"
+      }
     }],
     "routes": [{
       "src": "/(.*)",
