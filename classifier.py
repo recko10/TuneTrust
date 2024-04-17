@@ -93,7 +93,7 @@ def speakerDR(path_to_upload):
     print("SONG NAME: " + songName)
 
     # Define the URL and the headers
-    url = 'http://129.146.68.17:5001/predictions'
+    url = 'http://129.159.43.141:5001/predictions'
     headers = {'Content-Type': 'application/json; charset=utf-8'}
 
     # Define the payload data

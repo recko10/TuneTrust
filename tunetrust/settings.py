@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cwk49+ugc9tf7mb#fffj54y7g(bd09+324g837p=a#a37&8h#8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = False 
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 #Set root to store audio files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
