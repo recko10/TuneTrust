@@ -9,9 +9,6 @@ from pyannote.audio import Pipeline
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 
-# class Output(BaseModel):
-#     path: Path
-
 class Predictor(BasePredictor):
     def setup(self) -> None:
         #load pipeline
@@ -37,9 +34,6 @@ class Predictor(BasePredictor):
 
         print("PRE")
         print(path_to_upload)
-        # Dump the diarization output to disk using RTTM format
-        # with output_rttm_path.open("w") as rttm:
-        #     diarization.write_rttm(rttm)
 
         with open("/tmp/audio.txt", "w") as rttm:
             diarization.write_rttm(rttm)
@@ -47,10 +41,6 @@ class Predictor(BasePredictor):
         with open("/tmp/audio.txt", 'r') as f:
             print(f.read())
 
-        # Prepare the output path for the RTTM file using Cog's Path
-        # output_rttm_path = Output(file="/tmp/audio.rttm")
 
         print("POST")
-        # print(output_rttm_path)
-        # print(type(output_rttm_path))
         return Path("/tmp/audio.txt")
