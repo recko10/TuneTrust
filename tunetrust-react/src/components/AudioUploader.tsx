@@ -25,7 +25,7 @@ const AudioUploader = () => {
         const queryString = new URLSearchParams({ artist: selectedArtist }).toString();
     
         // Append the query string to the API endpoint URL
-        const url = `http://localhost:8000/playground/demo/?${queryString}`; //TODO change from localhost
+        const url = `https://tunetrust-cloud-ipynws4cra-wl.a.run.app:8000/playground/demo/?${queryString}`; //TODO change from localhost
         
         try {
             // Make a GET request to the API with the selected artist as a parameter
@@ -69,7 +69,7 @@ const AudioUploader = () => {
             formData.append('artist', selectedArtist); // Include the selected artist in the form data
 
             try {
-                const response = await fetch('http://localhost:8000/playground/upload/', { //TODO change from localhost
+                const response = await fetch('https://tunetrust-cloud-ipynws4cra-wl.a.run.app:8000/playground/upload/', { //TODO change from localhost
                     method: 'POST',
                     body: formData,
                 });
