@@ -8,6 +8,6 @@ steps:
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
-  args: ['run', 'deploy', 'tunetrust-cloud', '--image', 'gcr.io/tunetrust/backend_image', '--region', 'us-west2']
+  args: ['run', 'deploy', 'tunetrust-cloud', '--image', 'gcr.io/tunetrust/backend_image', '--region', 'us-west2', '--port', '8000']
 images:
 - gcr.io/tunetrust/backend_image
