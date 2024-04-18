@@ -44,3 +44,5 @@ class Predictor(BasePredictor):
 
         print("POST")
         return Path("/tmp/audio.txt")
+    
+    
