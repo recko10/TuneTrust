@@ -253,11 +253,12 @@ if __name__ == '__main__':
     #Separate stems for each of the artists using separate_stems
     #Convert kanye files to mp3 before getting stems
 
-    artists = ["Kanye West", "Playboi Carti", "Rihanna", "Future", "Young Thug", "Travis Scott", "Lil Baby", 
-               "Lil Uzi Vert", "Lil Wayne", "Tyler, the Creator", "Jay-Z", "Kid Cudi", "Snoop Dogg", "Eminem",
-               "Westside Gunn", "Conway the Machine", "Danny Brown", "Freddie Gibbs", "Lauryn Hill", "Hayley Williams"]
-    for x in artists:
-        separate_stems(x) 
-
-# gcloud compute scp --recurse ./ tunetrust-compute:./    to copy over this whole folder to the instance
-    
+    # artists = ["Kanye West", "Playboi Carti", "Rihanna", "Future", "Young Thug", "Travis Scott", "Lil Baby", 
+    #            "Lil Uzi Vert", "Lil Wayne", "Tyler, the Creator", "Jay-Z", "Kid Cudi", "Snoop Dogg", "Eminem",
+    #            "Westside Gunn", "Conway the Machine", "Danny Brown", "Freddie Gibbs", "Lauryn Hill", "Hayley Williams"]
+    # for x in artists:
+    #     separate_stems(x) 
+    artist = "Lil Uzi Vert"
+    # download_playlist("https://www.youtube.com/watch?v=_yBh_I5BLRM&list=PLC-tfB9OwTFHVTtkFdwjeZ_tNlme2Pkcz", artist)
+    convert_mp4_to_mp3(f"songs/{artist}")
+    separate_stems(artist) 

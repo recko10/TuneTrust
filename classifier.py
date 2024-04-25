@@ -16,30 +16,62 @@ speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/
 def topProbSpeakers(path_to_upload):
     print("UPLOADED: " + path_to_upload)
 
-    speakerDR(path_to_upload)
-
-    cos = nn.CosineSimilarity(dim=1, eps=1e-6)
-    threshold = 0.5 #0.5 originally
-    ref_embs = torch.load('embeddings.pt')
+    # speakerDR(path_to_upload) #TODO replace with parallelized version
 
     artist_to_probs = {}
+    passes = 1
+    for i in range(1, passes + 1):
+        chunkify(path_to_upload, 10 * i)
 
-    directory = 'diarization_temp/'
+        cos = nn.CosineSimilarity(dim=1, eps=1e-6)
+        threshold = 0.58 #0.5 originally
+        ref_embs = torch.load('embeddings.pt')
 
-    for filename in os.listdir(directory):
-        if filename.endswith(".mp3"):
-            new_emb = speaker_model.get_embedding(os.path.join(directory, filename))
-            sorted_embs = map(lambda item: (item[0], cos(item[1], new_emb).item()), ref_embs.items())
-            sorted_embs = filter(lambda x: x[1] > threshold, sorted_embs)
-            temp = dict(sorted_embs)
-            #Add new artists to running list of potentially featured artists
-            for key, value in temp.items():
-                if key not in artist_to_probs:
-                    artist_to_probs[key] = value
+        directory = 'diarization_temp/'
+        for filename in os.listdir(directory):
+            if filename.endswith(".mp3"):
+                new_emb = speaker_model.get_embedding(os.path.join(directory, filename))
+                sorted_embs = map(lambda item: (item[0], cos(item[1], new_emb).item()), ref_embs.items())
+                sorted_embs = filter(lambda x: x[1] > threshold, sorted_embs)
+                temp = dict(sorted_embs)
+                # Add new artists to running list of potentially featured artists
+                for key, value in temp.items():
+                    if key not in artist_to_probs:
+                        artist_to_probs[key] = [value, 1]  # Store value and count
+                    else:
+                        # Increment artist score and count
+                        artist_to_probs[key][0] += value
+                        artist_to_probs[key][1] += 1
 
-    cleanup_full_files()
+        deleteChunks()
+
+    # Average the values based on the count and update a new dictionary
+    averaged_probs = {}
+    for key, (total_prob, count) in artist_to_probs.items():
+        averaged_probs[key] = total_prob / count
+
+    # Now, use averaged_probs for further processing if needed
+    artist_to_probs = averaged_probs
+
+
     return dict(sorted(artist_to_probs.items(), key=lambda item: item[1], reverse=True))
 
+#Splits audio into chunks of length n seconds and then stores them in the 'diarization_temp' directory
+def chunkify(path_to_upload, n):
+    audio = AudioSegment.from_file(path_to_upload)
+    chunk_length_ms = n * 1000
+    chunks = audio[::chunk_length_ms]
+    for i, chunk in enumerate(chunks):
+        output_path = f"diarization_temp/chunk_{i}.mp3"
+        chunk.export(output_path, format="mp3")
+        print(f"Exported {output_path}")
+
+#Function to delete all files in the diarization_temp directory
+def deleteChunks():
+    directory = 'diarization_temp/'
+    for filename in os.listdir(directory):
+        if filename.endswith(".mp3"):
+            os.remove(os.path.join(directory, filename))
 
 #Cache all the speaker embeddings to a serialized file. To setup for this function, put all songs you want to convert in the songs folder (follow the structure that is outlined).
 def saveAllSpeakers():
@@ -238,5 +270,4 @@ def safe_delete_blob(bucket_name, blob_name):
         print(f"The blob {blob_name} does not exist.")
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
