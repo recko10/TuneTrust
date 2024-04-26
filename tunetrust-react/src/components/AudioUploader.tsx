@@ -88,7 +88,7 @@ const AudioUploader = () => {
                 <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '500px' }}>
                     <div className="mb-3 text-center">
                         <label htmlFor="audioUrl" className="form-label">
-                            Enter URL of the Audio File
+                           Enter YouTube Link 
                         </label>
                         <input
                             type="text"
@@ -96,7 +96,7 @@ const AudioUploader = () => {
                             id="audioUrl"
                             value={audioUrl}
                             onChange={e => setAudioUrl(e.target.value)}
-                            placeholder="http://example.com/audio.mp3"
+                            placeholder="https://www.youtube.com/"
                         />
                     </div>
                     <div className="d-grid gap-2">
