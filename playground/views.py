@@ -13,6 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from rest_framework.decorators import api_view
 from classifier import upload_blob, safe_delete_blob
+from pytube import YouTube
+
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "tunetrust-b19e33e4ecec.json"
 
@@ -39,9 +41,34 @@ def demo(request):
 class AudioFileUpload(APIView):
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        serializer = AudioFileSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        print(request.data)
+        link = request.data['audioUrl'] 
+        # url input from user 
+        yt = YouTube( 
+            str(link))
+
+        try:
+            # extract only audio 
+            video = yt.streams.filter(only_audio=True).first()
+        except KeyError:
+            print("Something went wrong! Skipping song")
+            return None
+
+        # check for destination to save file 
+        print("Enter the destination (leave blank for current directory)") 
+        destination = str(f"media/audio_files")
+
+        # download the file 
+        out_file = video.download(output_path=destination) 
+
+        # save the file 
+        base, ext = os.path.splitext(out_file) 
+        new_file = base + '.mp3'
+        os.rename(out_file, new_file.replace(" ", "_")) 
+
+        # result of success 
+        print(yt.title + " has been successfully downloaded.")
+
+        audio_file = AudioFile.objects.create(file=new_file)
+        serializer = AudioFileSerializer(audio_file)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

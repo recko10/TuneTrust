@@ -16,8 +16,6 @@ speaker_model = nemo_asr.models.EncDecSpeakerLabelModel.from_pretrained("nvidia/
 def topProbSpeakers(path_to_upload):
     print("UPLOADED: " + path_to_upload)
 
-    # speakerDR(path_to_upload) #TODO replace with parallelized version
-
     artist_to_probs = {}
     passes = 1
     for i in range(1, passes + 1):
@@ -52,9 +50,9 @@ def topProbSpeakers(path_to_upload):
 
     # Now, use averaged_probs for further processing if needed
     artist_to_probs = averaged_probs
-
-
-    return dict(sorted(artist_to_probs.items(), key=lambda item: item[1], reverse=True))
+    
+    #filter out artists_to_probs to only include the artists with the top 3 highest probabilities
+    return dict(sorted(artist_to_probs.items(), key=lambda item: item[1], reverse=True)[:3])
 
 #Splits audio into chunks of length n seconds and then stores them in the 'diarization_temp' directory
 def chunkify(path_to_upload, n):
