@@ -11,7 +11,8 @@ const AudioUploader = () => {
     async function callApiDemo(selectedArtist: string) {
         setIsLoading(true);
         const queryString = new URLSearchParams({ artist: selectedArtist }).toString();
-        const url = `https://tunetrust-cloud-ipynws4cra-wl.a.run.app/playground/demo/?${queryString}`;
+        // const url = `https://tunetrust-cloud-ipynws4cra-wl.a.run.app/playground/demo/?${queryString}`;
+        const url = `http://localhost:8000/playground/demo/?${queryString}`;
 
         try {
             const response = await fetch(url, {
@@ -50,16 +51,20 @@ const AudioUploader = () => {
         try {
             // const response = await fetch('https://tunetrust-cloud-ipynws4cra-wl.a.run.app/playground/upload/', {
             //     method: 'POST',
-            //     body: formData,
+            //     body: JSON.stringify({ audioUrl }),
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
             // });
 
-            const response = await fetch('https://tunetrust-cloud-ipynws4cra-wl.a.run.app/playground/upload/', {
+            const response = await fetch('http://localhost:8000/playground/upload/', {
                 method: 'POST',
                 body: JSON.stringify({ audioUrl }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
+
 
             if (response.ok) {
                 console.log('File successfully uploaded');

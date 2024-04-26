@@ -18,3 +18,4 @@ predict.py
 
 # Exclude Python virtual environment
 /venv
+
