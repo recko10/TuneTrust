@@ -88,7 +88,7 @@ const AudioUploader = () => {
                 <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '500px' }}>
                     <div className="mb-3 text-center">
                         <label htmlFor="audioUrl" className="form-label">
-                           Enter YouTube Link 
+                           Enter a YouTube Link 
                         </label>
                         <input
                             type="text"
