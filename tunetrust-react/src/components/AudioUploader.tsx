@@ -3,8 +3,8 @@ import ArtistProbabilitiesTable from './ArtistProbabilitiesTable.tsx';
 
 const AudioUploader = () => {
     const [audioUrl, setAudioUrl] = useState('');
-    const [selectedArtist, setSelectedArtist] = useState('');
-    const [submissionResult, setSubmissionResult] = useState('');
+    const [selectedArtist] = useState('');
+    const [submissionResult] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [artistProbs, setArtistProbs] = useState(null);
 
